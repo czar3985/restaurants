@@ -1,53 +1,46 @@
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+from database_setup import Base, Restaurant, MenuItem
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 import cgi
 
+
+def OpenIndexPage(self):
+    self.send_response(200)
+    self.send_header('Content-type', 'text/html')
+    self.end_headers()
+
+    restaurant_list = _session.query(Restaurant).all()
+
+    list_in_html = ''
+    for restaurant in restaurant_list:
+        list_in_html += '''
+            <p>
+                {}</br>
+                <a href='#'>Edit</a></br>
+                <a href='#'>Delete</a>
+            </p>
+            '''.format(restaurant.name)
+
+    output = '''
+        <html>
+        <body>
+            <a href='/restaurants/new'>Make A New Restaurant Here</a>
+            {}
+        </body>
+        </html>
+        '''.format(list_in_html)
+
+    self.wfile.write(output)
+    print(output)
+    return
 
 class WebServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
-            if self.path.endswith("/hello"):
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
-
-                output = '''
-                        <html>
-                        <body>
-                            Hello!
-                            <form method='POST' enctype='multipart/form-data' action='/hello'>
-                                <h2>What would you like me to say?</h2>
-                                <input name = 'message' type='text'>
-                                <input type='submit' value='Submit'>
-                            </form>
-                        </body>
-                        </html>
-                        '''
-
-                self.wfile.write(output)
-                print(output)
-                return
-
-            if self.path.endswith("/hola"):
-                self.send_response(200)
-                self.send_header('Content-type', 'text/html')
-                self.end_headers()
-
-                output = '''
-                        <html>
-                        <body>
-                            &#161Hola !
-                            <form method='POST' enctype='multipart/form-data' action='/hello'>
-                                <h2>What would you like me to say?</h2>
-                                <input name = 'message' type='text'>
-                                <input type='submit' value='Submit'>
-                            </form>
-                        </body>
-                        </html>
-                        '''
-
-                self.wfile.write(output)
-                print(output)
+            if self.path.endswith("/restaurants"):
+                OpenIndexPage(self)
                 return
 
         except IOError:
@@ -86,7 +79,14 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
 
 def main():
+    global _session
+
     try:
+        engine = create_engine('sqlite:///restaurantMenu.db')
+        Base.metadata.bind = engine
+        DBSession = sessionmaker(bind = engine)
+        _session = DBSession()
+
         port = 8080
         server = HTTPServer(('', port), WebServerHandler)
         print("Web Server running on port %s" % port)
