@@ -77,29 +77,18 @@ class WebServerHandler(BaseHTTPRequestHandler):
         try:
             self.send_response(301)
             self.send_header('Content-type', 'text/html')
+            self.send_header('Location', '/restaurants')
             self.end_headers()
 
             ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
             if ctype == 'multipart/form-data':
                 fields = cgi.parse_multipart(self.rfile, pdict)
-                messagecontent = fields.get('message')
+                input = fields.get('new_restaurant')
 
-            output = '''
-                    <html>
-                    <body>
-                        <h2> Okay, how about this: </h2>
-                        <h1> %s </h1>
-                        <form method='POST' enctype='multipart/form-data' action='/hello'>
-                            <h2>What would you like me to say?</h2>
-                            <input name = 'message' type='text'>
-                            <input type='submit' value='Submit'>
-                        </form>
-                    </body>
-                    </html>
-                    ''' % messagecontent[0]
-
-            self.wfile.write(output)
-            print(output)
+            new_entry = Restaurant(name = input[0])
+            _session.add(new_entry)
+            _session.commit()
+            return
 
         except:
             pass
