@@ -109,11 +109,6 @@ def CreateNewRestaurant(self):
 
 
 def EditRestaurantName(self):
-    self.send_response(301)
-    self.send_header('Content-type', 'text/html')
-    self.send_header('Location', '/restaurants')
-    self.end_headers()
-
     #Get the new name
     ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
     if ctype == 'multipart/form-data':
@@ -129,9 +124,15 @@ def EditRestaurantName(self):
     restaurant = _session.query(Restaurant).filter_by(id = restaurant_id).first()
 
     #Update restaurant name
-    restaurant.name = input[0]
-    _session.add(restaurant)
-    _session.commit()
+    if restaurant != []:
+        restaurant.name = input[0]
+        _session.add(restaurant)
+        _session.commit()
+
+        self.send_response(301)
+        self.send_header('Content-type', 'text/html')
+        self.send_header('Location', '/restaurants')
+        self.end_headers()
 
     return
 
