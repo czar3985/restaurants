@@ -40,6 +40,15 @@ Columns:
 {'primary_key': 0, 'nullable': True, 'default': None, 'autoincrement': 'auto', 'type': INTEGER(), 'name': u'restaurant_id'}
 ```
 
-## To Do
+## Features
 
-Coding ongoing
+- View restaurant entries in the database
+- Create a new restaurant entry
+- Update a restaurant name
+- Delete a restaurant from the database
+
+## To Dos
+
+- Update HTML and CSS to make it look better
+- CRUD operations for menu items per restaurant
+- Login and authentication
