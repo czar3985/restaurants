@@ -1,4 +1,8 @@
+# Use http.server for Python 3.xx
+#from http.server import BaseHTTPRequestHandler, HTTPServer
+# Use BaseHTTPServe for Python 2.xx
 from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+
 from database_setup import Base, Restaurant, MenuItem
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker

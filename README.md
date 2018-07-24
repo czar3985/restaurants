@@ -4,7 +4,7 @@ The restaurants application keeps a database of Restaurants and Menu Items for e
 
 ## Prerequisites
 
-1. python 3.6.3
+1. python 2.7.x
 2. sqlalchemy
 3. sqlite3
 4. _database_setup.py_ from the github repository [restaurants](https://github.com/czar3985/restaurants)
@@ -52,3 +52,15 @@ Columns:
 - Update HTML and CSS to make it look better
 - CRUD operations for menu items per restaurant
 - Login and authentication
+
+## Issues
+
+For python 2.xxx, use the BaseHTTPServer library in _webserver.py_:
+```python
+from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+```
+
+For python 3.xxx, use http.server library. Comment out the code above from _webserver.py_ and uncomment out the following line:
+```python
+from http.server import BaseHTTPRequestHandler, HTTPServer
+```
