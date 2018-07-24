@@ -1,0 +1,12 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/.vs/config/applicationhost.config
+/.vs/ProjectSettings.json
+/.vs/VSWorkspaceState.json
+/.vs/restaurant/v15/.suo
+/.vs/slnx.sqlite
+/ng_webserver.py
+/hello_webserver.py
+/database_setup.pyc

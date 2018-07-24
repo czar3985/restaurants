@@ -17,7 +17,7 @@ The following resource gives more information on how to run python scripts:
 
 _database_setup.py_ will setup the database: _restaurantmenu.db_
 
-_webserver.py_ will run the web server. 
+_webserver.py_ will run the web server 
 
 Navigate to port 8080, restaurants page of the server PC
 Ex: http://SERVERPC:8080/restaurants/
