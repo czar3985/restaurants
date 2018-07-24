@@ -35,12 +35,39 @@ def OpenIndexPage(self):
     print(output)
     return
 
+
+def OpenCreatePage(self):
+    self.send_response(200)
+    self.send_header('Content-type', 'text/html')
+    self.end_headers()
+
+    output = '''
+        <html>
+        <body>
+            <h1>Make A New Restaurant</h1>
+            <form method='POST' enctype='multipart/form-data' action='/restaurants/new'>
+                <input name='new_restaurant' type='text' placeholder="New Restaurant Name">
+                <input type='submit' value='Create'>
+            </form>
+        </body>
+        </html>
+        '''
+
+    self.wfile.write(output)
+    print(output)
+    return
+
+
 class WebServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         try:
             if self.path.endswith("/restaurants"):
                 OpenIndexPage(self)
+                return
+
+            if self.path.endswith("/restaurants/new"):
+                OpenCreatePage(self)
                 return
 
         except IOError:
