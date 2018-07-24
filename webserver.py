@@ -58,6 +58,24 @@ def OpenCreatePage(self):
     return
 
 
+def CreateNewRestaurant(self):
+    self.send_response(301)
+    self.send_header('Content-type', 'text/html')
+    self.send_header('Location', '/restaurants')
+    self.end_headers()
+
+    ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+    if ctype == 'multipart/form-data':
+        fields = cgi.parse_multipart(self.rfile, pdict)
+        input = fields.get('new_restaurant')
+
+    new_entry = Restaurant(name = input[0])
+    _session.add(new_entry)
+    _session.commit()
+
+    return
+
+
 class WebServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -75,20 +93,9 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
     def do_POST(self):
         try:
-            self.send_response(301)
-            self.send_header('Content-type', 'text/html')
-            self.send_header('Location', '/restaurants')
-            self.end_headers()
-
-            ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
-            if ctype == 'multipart/form-data':
-                fields = cgi.parse_multipart(self.rfile, pdict)
-                input = fields.get('new_restaurant')
-
-            new_entry = Restaurant(name = input[0])
-            _session.add(new_entry)
-            _session.commit()
-            return
+            if self.path.endswith("/restaurants/new"):
+                CreateNewRestaurant(self)
+                return
 
         except:
             pass
