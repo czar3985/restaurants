@@ -78,7 +78,7 @@ def OpenEditPage(self):
             <h1>{}</h1>
             <form method='POST' enctype='multipart/form-data' action='/restaurants/{}/edit'>
                 <input name='new_name' type='text' placeholder="New Restaurant Name">
-                <input type='submit' value='Create'>
+                <input type='submit' value='Rename'>
             </form>
         </body>
         </html>
@@ -107,6 +107,34 @@ def CreateNewRestaurant(self):
     return
 
 
+def EditRestaurantName(self):
+    self.send_response(301)
+    self.send_header('Content-type', 'text/html')
+    self.send_header('Location', '/restaurants')
+    self.end_headers()
+
+    #Get the new name
+    ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
+    if ctype == 'multipart/form-data':
+        fields = cgi.parse_multipart(self.rfile, pdict)
+        input = fields.get('new_name')
+
+    #Get the restaurant id from the path
+    path_elements = self.path.split('/')
+    id_string = path_elements[len(path_elements) - 2]
+    restaurant_id = int(id_string)
+
+    #Find restaurant to edit
+    restaurant = _session.query(Restaurant).filter_by(id = restaurant_id).first()
+
+    #Update restaurant name
+    restaurant.name = input[0]
+    _session.add(restaurant)
+    _session.commit()
+
+    return
+
+
 class WebServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -130,6 +158,10 @@ class WebServerHandler(BaseHTTPRequestHandler):
         try:
             if self.path.endswith("/restaurants/new"):
                 CreateNewRestaurant(self)
+                return
+
+            if self.path.endswith("/edit"):
+                EditRestaurantName(self)
                 return
 
         except:
