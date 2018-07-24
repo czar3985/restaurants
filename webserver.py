@@ -17,10 +17,10 @@ def OpenIndexPage(self):
         list_in_html += '''
             <p>
                 {}</br>
-                <a href='#'>Edit</a></br>
+                <a href='/restaurants/{}/edit'>Edit</a></br>
                 <a href='#'>Delete</a>
             </p>
-            '''.format(restaurant.name)
+            '''.format(restaurant.name, str(restaurant.id))
 
     output = '''
         <html>
@@ -58,6 +58,37 @@ def OpenCreatePage(self):
     return
 
 
+def OpenEditPage(self):
+    self.send_response(200)
+    self.send_header('Content-type', 'text/html')
+    self.end_headers()
+
+    #Get the restaurant id from the path
+    path_elements = self.path.split('/')
+    id_string = path_elements[len(path_elements) - 2]
+    restaurant_id = int(id_string)
+
+    #Find restaurant to edit
+    restaurant = _session.query(Restaurant).filter_by(id = restaurant_id).first()
+
+    #Form for renaming Restaurant name
+    output = '''
+        <html>
+        <body>
+            <h1>{}</h1>
+            <form method='POST' enctype='multipart/form-data' action='/restaurants/{}/edit'>
+                <input name='new_name' type='text' placeholder="New Restaurant Name">
+                <input type='submit' value='Create'>
+            </form>
+        </body>
+        </html>
+        '''.format(restaurant.name, str(restaurant.id))
+
+    self.wfile.write(output)
+    print(output)
+    return
+
+
 def CreateNewRestaurant(self):
     self.send_response(301)
     self.send_header('Content-type', 'text/html')
@@ -86,6 +117,10 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
             if self.path.endswith("/restaurants/new"):
                 OpenCreatePage(self)
+                return
+
+            if self.path.endswith("/edit"):
+                OpenEditPage(self)
                 return
 
         except IOError:
