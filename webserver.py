@@ -18,9 +18,9 @@ def OpenIndexPage(self):
             <p>
                 {}</br>
                 <a href='/restaurants/{}/edit'>Edit</a></br>
-                <a href='#'>Delete</a>
+                <a href='/restaurants/{}/delete'>Delete</a>
             </p>
-            '''.format(restaurant.name, str(restaurant.id))
+            '''.format(restaurant.name, str(restaurant.id), str(restaurant.id))
 
     output = '''
         <html>
@@ -90,6 +90,37 @@ def OpenEditPage(self):
     return
 
 
+def OpenDeletePage(self):
+    #Get the restaurant id from the path
+    path_elements = self.path.split('/')
+    id_string = path_elements[len(path_elements) - 2]
+    restaurant_id = int(id_string)
+
+    #Find restaurant to edit
+    restaurant = _session.query(Restaurant).filter_by(id = restaurant_id).first()
+
+    if restaurant != []:
+        self.send_response(200)
+        self.send_header('Content-type', 'text/html')
+        self.end_headers()
+
+        #Form for deleting Restaurant
+        output = '''
+            <html>
+            <body>
+                <h1>Are you sure you want to delete {}?</h1>
+                <form method='POST' enctype='multipart/form-data' action='/restaurants/{}/delete'>
+                    <input type='submit' value='Delete'>
+                </form>
+            </body>
+            </html>
+            '''.format(restaurant.name, str(restaurant.id))
+
+        self.wfile.write(output)
+        print(output)
+    return
+
+
 def CreateNewRestaurant(self):
     ctype, pdict = cgi.parse_header(self.headers.getheader('content-type'))
     if ctype == 'multipart/form-data':
@@ -137,6 +168,28 @@ def EditRestaurantName(self):
     return
 
 
+def DeleteRestaurant(self):
+    #Get the restaurant id from the path
+    path_elements = self.path.split('/')
+    id_string = path_elements[len(path_elements) - 2]
+    restaurant_id = int(id_string)
+
+    #Find restaurant to delete
+    restaurant = _session.query(Restaurant).filter_by(id = restaurant_id).first()
+
+    #Delete restaurant
+    if restaurant != []:
+        _session.delete(restaurant)
+        _session.commit()
+
+        self.send_response(301)
+        self.send_header('Content-type', 'text/html')
+        self.send_header('Location', '/restaurants')
+        self.end_headers()
+
+    return
+
+
 class WebServerHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
@@ -153,6 +206,10 @@ class WebServerHandler(BaseHTTPRequestHandler):
                 OpenEditPage(self)
                 return
 
+            if self.path.endswith("/delete"):
+                OpenDeletePage(self)
+                return
+
         except IOError:
             self.send_error(404, 'File Not Found: %s' % self.path)
 
@@ -164,6 +221,10 @@ class WebServerHandler(BaseHTTPRequestHandler):
 
             if self.path.endswith("/edit"):
                 EditRestaurantName(self)
+                return
+
+            if self.path.endswith("/delete"):
+                DeleteRestaurant(self)
                 return
 
         except:
